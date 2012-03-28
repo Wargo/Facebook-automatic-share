@@ -18,10 +18,22 @@ class FacebookAutomaticShare  {
 	var $object = 'article'; // tip
 	var $type = 'article'; // 'muysencillo:tip';
 	var $url = 'news.reads'; // 'muysencillo:tip';
-	
-	// Facebook Params
+	var $image = 'http://www.elmundoenrosa.com/wp-content/themes/cuidado_infantil/images/logoblog.png';
+
+	var $fields = array(
+		'namespace' => 'Namespace',
+		'action' => 'Acción',
+		'object' => 'Objeto',
+		'type' => 'Tipo',
+		'url' => 'URL',
+		'image' => 'Imagen por defecto',
+	);
 
 	function __construct() {
+		// Assign params
+		foreach ($this->fields as $key => $value) {
+			$this->$key = get_option('AFP_' . $key);
+		}
 		
 		// Creación de la tabla
 		//register_activation_hook(__FILE__, array(&$this, 'install'));
@@ -36,6 +48,48 @@ class FacebookAutomaticShare  {
 		
 		add_filter('wpfb_extended_permissions', array(&$this, 'publish_action_permission'));
 		
+		add_action('admin_menu', array(&$this, 'menu')); // Añade al menú del administrador la función menu()
+	}
+
+	function menu() {
+		add_options_page('AFP', 'AFP', 'manage_options', 'AFP', array(&$this, 'options_page'));
+	}
+
+	function options_page() {
+		if (!current_user_can('manage_options'))  {
+			wp_die( __('You do not have sufficient permissions to access this page.') );
+		}
+
+		if (!empty($_POST)) {
+			foreach ($this->fields as $key => $value) {
+				if (!empty($_POST[$key])) {
+					update_option('AFP_' . $key, $_POST[$key]);
+				}
+			}
+		}
+
+		global $wpdb;
+
+		echo '
+		<div class="wrap">
+			<div id="icon-options-general" class="icon32"></div>
+			<h2>' . __('Ajustes', true) . '</h2>
+			<p>' . __('Configuración del plugin', true) . '</p>
+			<form action="" method="post" enctype="multipart/form-data">
+				';
+				foreach ($this->fields as $key => $value) {
+					$option = get_option('AFP_' . $key);
+					echo '
+					<div>
+						<label for="' . $key . '">' . $value . '</label>
+						<input type="text" name="' . $key . '" id="' . $key . '" value="' . $option . '" />
+					<div>
+					';
+				}
+				echo '<p class="submit"><input type="submit" value="Guardar cambios" class="button-primary" id="submit" name="submit"></p>
+			</form>
+		</div>
+		';
 	}
 	
 	function fix_chrome () {
@@ -43,7 +97,6 @@ class FacebookAutomaticShare  {
 	}
 	
 	function publish_action_permission( $permissions ) {
-		//return $permissions;
 		return 'email,publish_actions';
 		if ($permissions == '') {
 			return 'publish_actions';
@@ -52,7 +105,6 @@ class FacebookAutomaticShare  {
 		}
 	}
 	
-
 	function install() {
 		
 	   global $wpdb;
@@ -93,17 +145,11 @@ class FacebookAutomaticShare  {
 				$image = $this->catch_that_image($post->post_content);
 			}
 			
-			
 			// Creamos la descripción	
 			if (! $description = $post->post_excerpt){
 				$description = preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ', $this->create_the_excerpt( $post->post_content ));;
 			}
 			
-			
-			
-			
-			
-		
 			echo '<meta property="og:title" content="' . $post->post_title .'" />
 			<meta property="og:type" content="' . $this->type . '" />
 			<meta property="og:url" content="' . get_permalink($post->ID) .'" />
@@ -112,15 +158,11 @@ class FacebookAutomaticShare  {
 			if ($image) {
 				echo '<meta property="og:image" content="' . $image .'" />';
 			} else {
-				echo '<meta property="og:image" content="http://www.elmundoenrosa.com/wp-content/themes/cuidado_infantil/images/logoblog.png" />';
+				echo '<meta property="og:image" content="' . $this->image . '" />';
 			}
 		}
 
 	}
-	
-	
-	
-
 	
 	/**
 	 * Publica en el muro
@@ -169,10 +211,8 @@ class FacebookAutomaticShare  {
 		}
 
 		return $content;
-		
 	}
 	
-
 	function fb_autologin ( ) {
 		global $post;
 		if (! is_user_logged_in() && (! empty($_REQUEST['fb_action_ids']) )) {
