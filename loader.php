@@ -2,7 +2,7 @@
 /*
 Plugin Name: Automatic Facebook Posting
 Description: Postea a FB lo que vayas leyendo. Este plugin requiere el plugin wp-fb-autoconnect
-Version: 1.0
+Version: 1.1
 Author: Guille & Arques
 Author URI: http://artvisual.net
 */
@@ -11,7 +11,7 @@ Author URI: http://artvisual.net
 
 class FacebookAutomaticShare  {
 
-	var $db_version = '1.0';
+	var $db_version = '1.1';
 	var $table_name = 'fb_autoshare';
 	var $namespace = 'elmundoenrosacom'; //'muysencillo';
 	var $action = 'read'; // learn
