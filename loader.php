@@ -13,12 +13,14 @@ class FacebookAutomaticShare  {
 
 	var $db_version = '1.1';
 	var $table_name = 'fb_autoshare';
-	var $namespace = 'elmundoenrosacom'; //'muysencillo';
-	var $action = 'read'; // learn
-	var $object = 'article'; // tip
-	var $type = 'article'; // 'muysencillo:tip';
-	var $url = 'news.reads'; // 'muysencillo:tip';
-	var $image = 'http://www.elmundoenrosa.com/wp-content/themes/cuidado_infantil/images/logoblog.png';
+
+	// Examples 
+	var $namespace = ''; // 'elmundoenrosacom', 'muysencillo'
+	var $action = ''; // 'read', 'learn'
+	var $object = ''; // 'article', 'tip'
+	var $type = ''; // 'article', 'muysencillo:tip'
+	var $url = ''; // 'news.reads', 'muysencillo:learn'
+	var $image = ''; // 'http://www.elmundoenrosa.com/wp-content/themes/cuidado_infantil/images/logoblog.png'
 
 	var $fields = array(
 		'namespace' => 'Namespace',
