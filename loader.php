@@ -26,6 +26,8 @@ class FacebookAutomaticShare  {
 	var $url = ''; // 'news.reads', 'muysencillo:learn'
 	var $image = ''; // 'http://www.elmundoenrosa.com/wp-content/themes/cuidado_infantil/images/logoblog.png'
 
+	var $current_post_id = '';
+
 	var $fields = array(
 		'namespace' => 'Namespace',
 		'action' => 'Acción',
@@ -45,9 +47,10 @@ class FacebookAutomaticShare  {
 		//register_activation_hook(__FILE__, array(&$this, 'install'));
 
 		// Acciones 
+		add_action('the_content', array(&$this, 'global_post'));
 		add_action('wpfb_add_to_asyncinit', array(&$this, 'fb_autologin'));
 		add_action('the_content', array(&$this, 'fb_publish_stream'));
-		//add_action('the_content', array(&$this, 'profile'));
+		add_action('the_post', array(&$this, 'friends'));
 		
 		add_action('wp_head', array(&$this, 'header_meta'));
 		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
@@ -62,6 +65,36 @@ class FacebookAutomaticShare  {
 		add_action('admin_menu', array(&$this, 'menu')); // Añade al menú del administrador la función menu()
 
 		add_action('wp_print_styles', array(&$this, 'styles'));
+	}
+
+	function global_post($content) {
+		if (is_single()) {
+			global $post;
+			$this->current_post_id = $post->ID;
+		}
+		return $content;
+	}
+
+	function friends($content) {
+		if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189')
+		if (is_user_logged_in() && is_single()) {
+			if (!$this->current_post_id) {
+				require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
+				require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
+				@include_once(WP_CONTENT_DIR . '/WP-FB-AutoConnect-Premium.php');
+				require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/facebook-platform/php-sdk-3.1.1/facebook.php');
+				$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true ));
+				$facebook->getUser();
+				$friends = $facebook->api('/me/friends');
+				$aux = array();
+				echo '<div class="fb_friends">';
+					foreach ($friends['data'] as $friend) {
+						$aux[] = $friend['id'];
+					}
+				echo '</div>';
+			}
+		}
+		return $content;
 	}
 
 	function add_widget() {
@@ -185,7 +218,7 @@ class FacebookAutomaticShare  {
 	 * @param unknown_type $content
 	 * @return unknown
 	 */
-	function fb_publish_stream ( $content ) {
+	function fb_publish_stream($content) {
 		if (is_user_logged_in() && is_single()) {
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
@@ -194,14 +227,14 @@ class FacebookAutomaticShare  {
 
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/facebook-platform/php-sdk-3.1.1/facebook.php');
 
-			global $user_ID, $post;
+			global $user_ID, $post, $wpdb;
 
 			$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true ));
 
-			if ($facebook->getUser()){
+			if ($fb_id = $facebook->getUser()){
 				// Creamos la descripción	
 				if (! $description = $post->post_excerpt){
-					$description = preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ', $this->create_the_excerpt($post->post_content));;
+					$description = preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ', $this->create_the_excerpt($post->post_content));
 				}
 
 				$image = $this->catch_that_image($post->post_content);
@@ -218,16 +251,22 @@ class FacebookAutomaticShare  {
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
-				$response = curl_exec($ch);
+				$response = json_decode(curl_exec($ch), true);
+
+				if (empty($response['error'])) {
+					$table_name = $wpdb->prefix . $this->table_name;
+					$sql = "INSERT INTO $table_name (time, user_id, fb_id, post_id) values (NOW(), '$user_ID', '$fb_id', '$post->ID')";
+					$wpdb->query($sql);
+				}
 			}
 		}
 
 		return $content;
 	}
 
-	function fb_autologin ( ) {
+	function fb_autologin() {
 		global $post;
-		if (! is_user_logged_in() && (! empty($_REQUEST['fb_action_ids']) )) {
+		if (!is_user_logged_in() && (!empty($_REQUEST['fb_action_ids']))) {
 			// Revisar el like del plugin de FB
 			echo 'jfb_js_login_callback();';
 		} 

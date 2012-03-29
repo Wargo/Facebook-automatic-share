@@ -8,10 +8,10 @@ jQuery(document).ready(function($) {
 			var url = 'https://graph.facebook.com/' + $(this).attr('var');
 
 			$.ajax({
-			  type: 'post',
-			  url: url,
-			  data: {"method":"delete","access_token":$(this).attr('data')},
-			  dataType: 'json' 
+				type: 'post',
+				url: url,
+				data: {"method":"delete","access_token":$(this).attr('data')},
+				dataType: 'json' 
 			});
 		}
 	});
