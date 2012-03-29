@@ -63,7 +63,9 @@ class Foo_Widget extends WP_Widget {
 			foreach ($articles['data'] as $article) {
 				echo '<li>';
 					echo '<span title="Borrar artículo" class="delete_article" data="' . $facebook->getAccessToken() . '" var="' . $article['id'] . '"></span>';
+					echo '<a href="' . $article['data'][$this->object]['url'] . '">';
 					echo $article['data'][$this->object]['title'];
+					echo '</a>';
 				echo '</li>';
 			}
 
