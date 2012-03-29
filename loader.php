@@ -60,6 +60,8 @@ class FacebookAutomaticShare  {
 		add_filter('wpfb_extended_permissions', array(&$this, 'publish_action_permission'));
 
 		add_action('admin_menu', array(&$this, 'menu')); // Añade al menú del administrador la función menu()
+
+		add_action('wp_print_styles', array(&$this, 'styles'));
 	}
 
 	function add_widget() {
@@ -256,6 +258,11 @@ class FacebookAutomaticShare  {
 
 		return $content;
 	}
+
+	function styles () {
+		wp_enqueue_style('fas_style', '/wp-content/plugins/facebook-automatic-share/style.css');
+		//wp_enqueue_js('fas_style', '/wp-content/plugins/facebook-automatic-share/js.js');
+	} 
 
 	function debug($array) {
 		if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189') {

@@ -28,10 +28,7 @@ class Foo_Widget extends WP_Widget {
 		extract( $args );
 		$title = apply_filters( 'widget_title', $instance['title'] );
 
-		echo $before_widget;
-		if ( ! empty( $title ) ) {
-			echo $before_title . $title . $after_title;
-		}
+		if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189')
 		if (is_user_logged_in() && is_single()) {
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
@@ -47,9 +44,28 @@ class Foo_Widget extends WP_Widget {
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
 			$response = curl_exec($ch);
-			$articles = json_decode($response);
+			$articles = json_decode($response, true);
+			
+			if (count($articles)) {
+				echo $before_widget;
+				if ( ! empty( $title ) ) {
+					echo $before_title . $title . $after_title;
+				}
+				echo '<ul class="fb_articles_list">';
+			}
+			
+			foreach ($articles['data'] as $article) {
+				echo '<li>';
+					echo $article['data']['article']['title'];
+					echo ' <span class="delete_article" var="' . $article['id'] . '"></span>';
+				echo '</li>';
+			}
+
+			if (count($articles)) {
+				echo '</ul>';
+				echo $after_widget;
+			}
 		}
-		echo $after_widget;
 	}
 
 	/**
