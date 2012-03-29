@@ -8,11 +8,18 @@ class Foo_Widget extends WP_Widget {
 	/**
 	 * Register widget with WordPress.
 	 */
+
+	var $object = '';
+	var $url = '';
+
 	public function __construct() {
+		$this->object = get_option('AFP_object');
+		$this->url = get_option('AFP_url');
+
 		parent::__construct(
 			'foo_widget', // Base ID
-			'Foo_Widget', // Name
-			array( 'description' => __( 'A Foo Widget', 'text_domain' ), ) // Args
+			'Artículos de Facebook', // Name
+			array( 'description' => __( 'Artículos de facebook compartidos, con posibilidad de eliminarlos', 'text_domain' ), ) // Args
 		);
 	}
 
@@ -37,7 +44,7 @@ class Foo_Widget extends WP_Widget {
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/facebook-platform/php-sdk-3.1.1/facebook.php');
 			$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true ));
 			$facebook->getUser();
-			$get_posts = 'https://graph.facebook.com/me/news.reads?access_token=' . $facebook->getAccessToken();
+			$get_posts = 'https://graph.facebook.com/me/' . $this->url . '?access_token=' . $facebook->getAccessToken();
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $get_posts);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -45,7 +52,7 @@ class Foo_Widget extends WP_Widget {
 			$response = curl_exec($ch);
 			$articles = json_decode($response, true);
 			
-			if (count($articles)) {
+			if (count($articles['data'])) {
 				echo $before_widget;
 				if ( ! empty( $title ) ) {
 					echo $before_title . $title . $after_title;
@@ -55,7 +62,7 @@ class Foo_Widget extends WP_Widget {
 			
 			foreach ($articles['data'] as $article) {
 				echo '<li>';
-					echo $article['data']['article']['title'];
+					echo $article['data'][$this->object]['title'];
 					echo ' <span class="delete_article" data="' . $facebook->getAccessToken() . '" var="' . $article['id'] . '"></span>';
 				echo '</li>';
 			}
