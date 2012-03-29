@@ -7,8 +7,11 @@
  Author URI: http://artvisual.net
  */
 
-//error_reporting(E_ALL);
-//ini_set('display_errors', '1');	
+if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189') {
+	//error_reporting(E_ALL);ini_set('display_errors', '1');	
+}
+
+require_once 'widget.php';
 
 class FacebookAutomaticShare  {
 
@@ -44,10 +47,14 @@ class FacebookAutomaticShare  {
 		// Acciones 
 		add_action('wpfb_add_to_asyncinit', array(&$this, 'fb_autologin'));
 		add_action('the_content', array(&$this, 'fb_publish_stream'));
-		add_action('the_content', array(&$this, 'profile'));
+		//add_action('the_content', array(&$this, 'profile'));
+		
 		add_action('wp_head', array(&$this, 'header_meta'));
 		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
 
+		//add_action('widgets_init', create_function('', 'register_widget("Foo_Widget");'));
+		add_action('widgets_init', array(&$this, 'add_widget'));
+			
 		//add_action('wpfb_add_to_asyncinit', array(&$this, 'fix_chrome'));
 
 		add_filter('wpfb_extended_permissions', array(&$this, 'publish_action_permission'));
@@ -55,24 +62,8 @@ class FacebookAutomaticShare  {
 		add_action('admin_menu', array(&$this, 'menu')); // Añade al menú del administrador la función menu()
 	}
 
-	function profile() {
-		if (is_user_logged_in() && is_single()) {
-			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
-			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
-
-			@include_once(WP_CONTENT_DIR . '/WP-FB-AutoConnect-Premium.php');
-
-			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/facebook-platform/php-sdk-3.1.1/facebook.php');
-			$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true ));
-			$facebook->getUser();
-			$get_posts = 'https://graph.facebook.com/me/news.reads?access_token=' . $facebook->getAccessToken();
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $get_posts);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-			$response = curl_exec($ch);
-			$this->debug($response);
-		}
+	function add_widget() {
+		register_widget('Foo_Widget');
 	}
 
 	function menu() {
@@ -267,9 +258,11 @@ class FacebookAutomaticShare  {
 	}
 
 	function debug($array) {
-		echo '<pre>';
-		print_r($array);
-		echo '</pre>';
+		if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189') {
+			echo '<pre>';
+			print_r($array);
+			echo '</pre>';
+		}
 	}
 
 }
