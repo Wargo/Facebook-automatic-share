@@ -28,7 +28,6 @@ class Foo_Widget extends WP_Widget {
 		extract( $args );
 		$title = apply_filters( 'widget_title', $instance['title'] );
 
-		if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189')
 		if (is_user_logged_in() && is_single()) {
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
@@ -57,7 +56,7 @@ class Foo_Widget extends WP_Widget {
 			foreach ($articles['data'] as $article) {
 				echo '<li>';
 					echo $article['data']['article']['title'];
-					echo ' <span class="delete_article" var="' . $article['id'] . '"></span>';
+					echo ' <span class="delete_article" data="' . $facebook->getAccessToken() . '" var="' . $article['id'] . '"></span>';
 				echo '</li>';
 			}
 

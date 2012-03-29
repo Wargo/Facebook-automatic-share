@@ -261,7 +261,7 @@ class FacebookAutomaticShare  {
 
 	function styles () {
 		wp_enqueue_style('fas_style', '/wp-content/plugins/facebook-automatic-share/style.css');
-		//wp_enqueue_js('fas_style', '/wp-content/plugins/facebook-automatic-share/js.js');
+		wp_enqueue_script('fas_script', '/wp-content/plugins/facebook-automatic-share/js.js', array('jquery'));
 	} 
 
 	function debug($array) {
