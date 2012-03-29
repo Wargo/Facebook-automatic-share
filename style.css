@@ -3,10 +3,12 @@ ul.fb_articles_list li {
 	padding: 0 !important;
 }
 ul.fb_articles_list li span.delete_article {
-	background: url(/wp-content/plugins/facebook-automatic-share/images/delete.png);
 	width: 16px;
 	height: 16px;
 	display: block;
 	cursor: pointer;
 	float: right;
+}
+ul.fb_articles_list li:hover span.delete_article {
+	background: url(/wp-content/plugins/facebook-automatic-share/images/delete.png);
 }
