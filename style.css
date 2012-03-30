@@ -1,3 +1,30 @@
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+ 
+.clearfix {
+	display: inline-block;
+}
+ 
+html[xmlns] .clearfix {
+	display: block;
+}
+ 
+* html .clearfix {
+	height: 1%;
+}
+
 ul.fb_articles_list li {
 	margin: 0 0 5px 0 !important;
 	padding: 0 !important;
@@ -11,4 +38,12 @@ ul.fb_articles_list li span.delete_article {
 }
 ul.fb_articles_list li:hover span.delete_article {
 	background: url(/wp-content/plugins/facebook-automatic-share/images/delete.png);
+}
+
+.fb_enable,
+.fb_disable{
+	font-size: 10px;
+	float: right;
+	width: 70px;
+	display: block;
 }

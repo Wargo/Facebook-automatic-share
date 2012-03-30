@@ -98,7 +98,7 @@ class FacebookAutomaticShare  {
 	}
 
 	function add_widget() {
-		register_widget('Foo_Widget');
+		register_widget('FB_Widget');
 	}
 
 	function menu() {
@@ -134,7 +134,7 @@ class FacebookAutomaticShare  {
 					<label for="' . $key . '">' . $value . '</label>
 					<input type="text" name="' . $key . '" id="' . $key . '" value="' . $option . '" />
 					<div>
-					';
+				';
 			}
 		echo '<p class="submit"><input type="submit" value="Guardar cambios" class="button-primary" id="submit" name="submit"></p>
 			</form>
@@ -219,7 +219,7 @@ class FacebookAutomaticShare  {
 	 * @return unknown
 	 */
 	function fb_publish_stream($content) {
-		if (is_user_logged_in() && is_single()) {
+		if (is_user_logged_in() && is_single() && empty($_SESSION['fb_disable'])) {
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
 

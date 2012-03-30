@@ -16,4 +16,17 @@ jQuery(document).ready(function($) {
 		}
 	});
 
+	$('.disable_fb').click(function() {
+		$(this).html('<img src="/wp-content/plugins/facebook-automatic-share/images/ajax-loader.gif" />');
+		$.ajax({
+			type: 'get',
+			url: url,
+			success: function() {
+				$(this).html('Deshabilitado');
+				$(this).attr('title', 'Publicación automática en Facebook deshabilitada');
+			}
+		});
+		return false;
+	});
+
 });

@@ -3,7 +3,7 @@
  * Adds Foo_Widget widget.
  */
 
-class Foo_Widget extends WP_Widget {
+class FB_Widget extends WP_Widget {
 
 	/**
 	 * Register widget with WordPress.
@@ -17,9 +17,9 @@ class Foo_Widget extends WP_Widget {
 		$this->url = get_option('AFP_url');
 
 		parent::__construct(
-			'foo_widget', // Base ID
+			'fb_widget', // Base ID
 			'Artículos de Facebook', // Name
-			array( 'description' => __( 'Artículos de facebook compartidos, con posibilidad de eliminarlos', 'text_domain' ), ) // Args
+			array('description' => __('Artículos de facebook compartidos, con posibilidad de eliminarlos', 'text_domain'))
 		);
 	}
 
@@ -54,10 +54,15 @@ class Foo_Widget extends WP_Widget {
 			
 			if (count($articles['data'])) {
 				echo $before_widget;
-				if ( ! empty( $title ) ) {
-					echo $before_title . $title . $after_title;
+				if (empty($_SESSION['fb_disable'])) {
+					echo '<a href="/wp-content/plugins/facebook-automatic-share/disable.php" class="fb_disable" title="' . __('Deshabilitar publicación automática en Facebook', true) . '">' . __('Deshabilitar', true) . '</a>';
+				} else {
+					echo '<a class="fb_enable" title="' . __('Publicación automática en Facebook deshabilitada', true) . '">' . __('Deshabilitado', true) . '</a>';
 				}
-				echo '<ul class="fb_articles_list">';
+				if ( ! empty( $title ) ) {
+					echo '<div class="left">' . $before_title . $title . $after_title . '</div>';
+				}
+				echo '<ul class="fb_articles_list clearfix">';
 			}
 			
 			foreach ($articles['data'] as $article) {
