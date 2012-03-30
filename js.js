@@ -23,11 +23,12 @@ jQuery(document).ready(function($) {
 function fb_switcher($) {
 	$('.fb_switcher').click(function() {
 		var item = $(this);
-		item.html('<img src="/wp-content/plugins/facebook-automatic-share/images/ajax-loader.gif" />');
+		item.addClass('fb_loading');
 		$.ajax({
 			type: 'get',
 			url: item.attr('href'),
 			success: function(data) {
+				item.removeClass('fb_loading');
 				if (item.hasClass('fb_disable')) {
 					item.attr('title', 'Habilitar la publicación automática en Facebook');
 					item.attr('href', '/wp-content/plugins/facebook-automatic-share/enable.php');
