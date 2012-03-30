@@ -50,7 +50,12 @@ class FacebookAutomaticShare  {
 		add_action('the_content', array(&$this, 'global_post'));
 		add_action('wpfb_add_to_asyncinit', array(&$this, 'fb_autologin'));
 		add_action('the_content', array(&$this, 'fb_publish_stream'));
-		add_action('the_post', array(&$this, 'friends'));
+		//add_action('the_post', array(&$this, 'friends'));
+		add_action('the_post', array(&$this, 'lazy'));
+
+		// Cargar por Ajax
+		add_action('wp_ajax_friends_action', array(&$this, 'friends'));
+		add_action('wp_ajax_nopriv_friends_action', array(&$this, 'friends'));
 		
 		add_action('wp_head', array(&$this, 'header_meta'));
 		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
@@ -75,26 +80,74 @@ class FacebookAutomaticShare  {
 		return $content;
 	}
 
-	function friends($content) {
-		if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189')
-		if (is_user_logged_in() && is_single()) {
-			if (!$this->current_post_id) {
+	function lazy($content) {
+		if ($_SERVER['REMOTE_ADDR'] != '81.202.166.189') {
+			return $content;
+		}
+
+		if (is_single()) {
+			echo '<div id="lazy"></div>';
+		}
+		return $content;
+	}
+
+	//function friends($content) {
+	function friends() {
+		if (!$this->current_post_id) {
+			if (!is_user_logged_in()) {
+				echo '<span class="title">' . __('Descubre qué trucos les han gustado a tus amigos', true) . '</span>';
+				echo '<ul class="fb_friends clearfix">';
+					if ($image = get_option('AFP_social')) {
+						echo '<fb:login-button scope="email,publish_actions" v="2" size="small" onlogin="jfb_js_login_callback();"><img src="' . $image . '" class="fb_social" /></fb:login-button>';
+					}
+				echo '</ul>';
+			} else {
 				require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
 				require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
 				@include_once(WP_CONTENT_DIR . '/WP-FB-AutoConnect-Premium.php');
 				require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/facebook-platform/php-sdk-3.1.1/facebook.php');
 				$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true ));
-				$facebook->getUser();
+				$facebook_user = $facebook->getUser();
 				$friends = $facebook->api('/me/friends');
 				$aux = array();
-				echo '<div class="fb_friends">';
-					foreach ($friends['data'] as $friend) {
-						$aux[] = $friend['id'];
-					}
-				echo '</div>';
+				global $wpdb;
+				$table_name = $wpdb->prefix . $this->table_name;
+
+				if (count($friends['data'])) {
+					echo '<span class="title">' . __('Descubre qué trucos les han gustado a tus amigos', true) . '</span>';
+					echo '<ul class="fb_friends clearfix">';
+						foreach ($friends['data'] as $friend) {
+							$aux[] = $friend['id'];
+						}
+						$sql = "SELECT fb_id, count(*) as num FROM $table_name WHERE fb_id in (" . implode(',', $aux) . ") GROUP BY fb_id ORDER BY num desc LIMIT 10";
+						$friends = $wpdb->get_results($sql);
+						foreach ($friends as $friend) {
+							$user = $facebook->api('/' . $friend->fb_id, array(
+								'fields' => array(
+									'name',
+									'picture',
+								),
+							));
+							echo '<li class="fb_user" title="' . $user['name'] . ' ' . sprintf('ha visto %s artículo(s)', $friend->num) . '">';
+								echo '<img src="' . $user['picture'] . '" />';
+								echo '<ul class="hidden fb_articles">';
+									echo '<li class="fb_title_articles">' . sprintf(__('Artículos leídos por %s', true), $user['name']) . '</li>';
+									$sql = "SELECT post_id FROM $table_name WHERE fb_id = $friend->fb_id";
+									$articles = $wpdb->get_results($sql);
+									foreach ($articles as $article) {
+										echo '<li class="fb_post_image">';
+											echo '<a href="' . get_permalink($article->post_id) . '">' . get_the_post_thumbnail($article->post_id, array(200, 200)) . '</a>';
+										echo '</li>';
+									}
+								echo '</ul>';
+							echo '</li>';
+						}
+					echo '</ul>';
+				}
 			}
 		}
-		return $content;
+		die;
+		//return $content;
 	}
 
 	function add_widget() {
@@ -116,6 +169,10 @@ class FacebookAutomaticShare  {
 					update_option('AFP_' . $key, $_POST[$key]);
 				}
 			}
+			if (!empty($_FILES['logo']['size'])) {
+				$logo = wp_handle_upload($_FILES['logo']);
+				update_option('AFP_social', $logo['url']);
+			}
 		}
 
 		global $wpdb;
@@ -126,17 +183,28 @@ class FacebookAutomaticShare  {
 			<h2>' . __('Ajustes', true) . '</h2>
 			<p>' . __('Configuración del plugin', true) . '</p>
 			<form action="" method="post" enctype="multipart/form-data">
-			';
-			foreach ($this->fields as $key => $value) {
-				$option = get_option('AFP_' . $key);
-				echo '
-					<div>
-					<label for="' . $key . '">' . $value . '</label>
-					<input type="text" name="' . $key . '" id="' . $key . '" value="' . $option . '" />
-					<div>
 				';
-			}
-		echo '<p class="submit"><input type="submit" value="Guardar cambios" class="button-primary" id="submit" name="submit"></p>
+				foreach ($this->fields as $key => $value) {
+					$option = get_option('AFP_' . $key);
+					echo '
+					<div>
+						<label for="' . $key . '">' . $value . '</label>
+						<input type="text" name="' . $key . '" id="' . $key . '" value="' . $option . '" />
+					<div>
+					';
+				}
+				echo '
+				<div>
+				    <label for="logo">' . __('Adjunta una imagen para el módulo de compartir', true) . '</label>
+				    <input type="file" name="logo" id="logo" />';
+				    if ($img = get_option('AFP_social')) {
+					echo '<br /><img src="' . $img . '" style="max-width: 200px;" />';
+				    }   
+				    wp_nonce_field('upload_AFP_social');
+				    echo '
+				    <input type="hidden" name="action" value="wp_handle_upload" />
+				</div>';
+				echo '<p class="submit"><input type="submit" value="Guardar cambios" class="button-primary" id="submit" name="submit"></p>
 			</form>
 			</div>
 			';
@@ -301,6 +369,8 @@ class FacebookAutomaticShare  {
 	function styles () {
 		wp_enqueue_style('fas_style', '/wp-content/plugins/facebook-automatic-share/style.css');
 		wp_enqueue_script('fas_script', '/wp-content/plugins/facebook-automatic-share/js.js', array('jquery'));
+		$data = array('ajaxurl' => admin_url('admin-ajax.php'));
+		wp_localize_script('fas_script', 'config', $data);
 	} 
 
 	function debug($array) {

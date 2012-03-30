@@ -1,4 +1,13 @@
-jQuery(document).ready(function($) {	
+jQuery(document).ready(function($) {
+
+	if ($("#lazy").size() > 0) {
+		//var ajaxurl = 'http://www.muysencillo.com/wp-admin/admin-ajax.php';
+		var ajaxurl = config.ajaxurl;
+		$.post(ajaxurl, {action: 'friends_action'}, function(response) {
+			$("#lazy").html(response);
+			fb_friends($);
+		});
+	}
 
 	$('.delete_article').click(function() {
 		if (confirm('¿Deseas elmiminar este artículo?')) {
@@ -41,5 +50,19 @@ function fb_switcher($) {
 			}
 		});
 		return false;
+	});
+}
+
+function fb_friends($) {
+	$('.fb_friends li.fb_user').click(function() {
+		var current_marked = $(this).attr('class');
+		$('.fb_friends li.fb_user').removeClass('fb_marked');
+		$(this).attr('class', current_marked);
+		$(this).toggleClass('fb_marked');
+
+		var current_class = $(this).find('ul').attr('class');
+		$('ul.fb_articles').addClass('hidden');
+		$(this).find('ul').attr('class', current_class);
+		$(this).find('ul').toggleClass('hidden');
 	});
 }
