@@ -40,10 +40,20 @@ ul.fb_articles_list li:hover span.delete_article {
 	background: url(/wp-content/plugins/facebook-automatic-share/images/delete.png);
 }
 
-.fb_enable,
-.fb_disable{
+.fb_switcher {
 	font-size: 10px;
 	float: right;
-	width: 70px;
+	width: 30px;
+	height: 30px;
 	display: block;
+}
+
+.fb_switcher.fb_disable:hover,
+.fb_switcher.fb_enable {
+	background: url(/wp-content/plugins/facebook-automatic-share/images/disabled.png);
+}
+
+.fb_switcher.fb_enable:hover,
+.fb_switcher.fb_disable {
+	background: url(/wp-content/plugins/facebook-automatic-share/images/enabled.png);
 }

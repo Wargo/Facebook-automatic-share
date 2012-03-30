@@ -55,9 +55,9 @@ class FB_Widget extends WP_Widget {
 			if (count($articles['data'])) {
 				echo $before_widget;
 				if (empty($_SESSION['fb_disable'])) {
-					echo '<a href="/wp-content/plugins/facebook-automatic-share/disable.php" class="fb_disable" title="' . __('Deshabilitar publicación automática en Facebook', true) . '">' . __('Deshabilitar', true) . '</a>';
+					echo '<a href="/wp-content/plugins/facebook-automatic-share/disable.php" class="fb_switcher fb_disable" title="' . __('Deshabilitar publicación automática en Facebook', true) . '"></a>';
 				} else {
-					echo '<a class="fb_enable" title="' . __('Publicación automática en Facebook deshabilitada', true) . '">' . __('Deshabilitado', true) . '</a>';
+					echo '<a href="/wp-content/plugins/facebook-automatic-share/enable.php" class="fb_switcher fb_enable" title="' . __('Habilitar la publicación automática en Facebook', true) . '"></a>';
 				}
 				if ( ! empty( $title ) ) {
 					echo '<div class="left">' . $before_title . $title . $after_title . '</div>';
