@@ -55,7 +55,7 @@ ul.fb_articles_list li:hover span.delete_article {
 
 .fb_switcher.fb_enable:hover,
 .fb_switcher.fb_disable {
-	background: url(/wp-content/plugins/facebook-automatic-share/images/enabled.gif) no-repeat;;
+	background: url(/wp-content/plugins/facebook-automatic-share/images/enabled.png) no-repeat;;
 }
 
 .fb_switcher.fb_loading {
