@@ -54,7 +54,7 @@ function fb_switcher($) {
 }
 
 function fb_friends($) {
-	$('.fb_friends li.fb_user').click(function() {
+	$('.fb_friends li.fb_user').hover(function() {
 		var current_marked = $(this).attr('class');
 		$('.fb_friends li.fb_user').removeClass('fb_marked');
 		$(this).attr('class', current_marked);

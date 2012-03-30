@@ -74,10 +74,10 @@ ul.fb_articles_list li:hover span.delete_article {
 }
 
 .fb_friends {
-	padding: 0;
+	padding: 5px;
 	margin: 0;
-	background: #EEE;
-	width: 104%;
+	background: #FFF;
+	width: 102%;
 	position: relative;
 }
 
@@ -97,13 +97,13 @@ ul.fb_articles_list li:hover span.delete_article {
 
 .fb_friends li.fb_user ul.fb_articles {
 	z-index: 999;
-	background: #EEE;
+	background: #FFF;
 	border: solid 2px #999;
 	padding: 5px;
 	list-style: none;
 	margin: 0;
 	position: absolute;
-	top: 56px;
+	top: 61px;
 	left: 0px;
 	width: 816px;
 }

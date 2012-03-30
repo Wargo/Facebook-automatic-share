@@ -81,10 +81,6 @@ class FacebookAutomaticShare  {
 	}
 
 	function lazy($content) {
-		if ($_SERVER['REMOTE_ADDR'] != '81.202.166.189') {
-			return $content;
-		}
-
 		if (is_single()) {
 			echo '<div id="lazy"></div>';
 		}
@@ -321,7 +317,7 @@ class FacebookAutomaticShare  {
 
 				$response = json_decode(curl_exec($ch), true);
 
-				if (empty($response['error'])) {
+				if (!empty($response['id'])) {
 					$table_name = $wpdb->prefix . $this->table_name;
 					$sql = "INSERT INTO $table_name (time, user_id, fb_id, post_id) values (NOW(), '$user_ID', '$fb_id', '$post->ID')";
 					$wpdb->query($sql);
