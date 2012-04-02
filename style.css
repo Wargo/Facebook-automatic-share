@@ -80,7 +80,6 @@ ul.fb_articles_list li:hover span.delete_article {
 .fb_friends {
 	padding: 5px;
 	margin: 0;
-	background: #FFF;
 	width: 102%;
 	position: relative;
 }
@@ -109,7 +108,7 @@ ul.fb_articles_list li:hover span.delete_article {
 	position: absolute;
 	top: 61px;
 	left: 0px;
-	width: 816px;
+	width: 860px;
 }
 
 .fb_marked {

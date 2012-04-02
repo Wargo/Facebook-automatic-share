@@ -123,7 +123,7 @@ class FacebookAutomaticShare  {
 								$articles = $wpdb->get_results($sql);
 								foreach ($articles as $article) {
 									$image = '';
-									$post_thumbnail_id = get_post_meta( $article->post_id, '_thumbnail_id', true );
+									$post_thumbnail_id = get_post_meta($article->post_id, '_thumbnail_id', true );
 
 									if ($post_thumbnail_id) {
 										$image = wp_get_attachment_image_src($post_thumbnail_id);
@@ -136,8 +136,7 @@ class FacebookAutomaticShare  {
 										$image = $this->catch_that_image($post->post_content);
 									}
 									echo '<li class="fb_post_image">';
-										//echo '<a href="' . get_permalink($article->post_id) . '">' . get_the_post_thumbnail($article->post_id, array(200, 200)) . '</a>';
-										echo '<a href="' . get_permalink($article->post_id) . '"><img src="' . $image . '" /></a>';
+										echo '<a title="' . get_the_title($article->post_id) . '" href="' . get_permalink($article->post_id) . '"><img src="' . $image . '" alt="' . get_the_title($article->post_id) . '" /></a>';
 									echo '</li>';
 								}
 							echo '</ul>';
