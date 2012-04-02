@@ -53,10 +53,8 @@ class FacebookAutomaticShare  {
 		//add_action('the_post', array(&$this, 'friends'));
 
 		// Cargar por Ajax
-		if ($_SERVER['REMOTE_ADDR'] == '81.202.166.189') {
-			add_action('wp_ajax_friends_action', array(&$this, 'friends'));
-			add_action('wp_ajax_nopriv_friends_action', array(&$this, 'friends'));
-		}
+		add_action('wp_ajax_friends_action', array(&$this, 'friends'));
+		add_action('wp_ajax_nopriv_friends_action', array(&$this, 'friends'));
 		
 		add_action('wp_head', array(&$this, 'header_meta'));
 		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
