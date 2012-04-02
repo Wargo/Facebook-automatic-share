@@ -107,7 +107,7 @@ ul.fb_articles_list li:hover span.delete_article {
 	margin: 0;
 	position: absolute;
 	top: 61px;
-	left: 0px;
+	left: -50px;
 	width: 860px;
 }
 
