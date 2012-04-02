@@ -52,9 +52,11 @@ class FacebookAutomaticShare  {
 		// Cargar por Ajax
 		add_action('wp_ajax_friends_action', array(&$this, 'friends'));
 		add_action('wp_ajax_nopriv_friends_action', array(&$this, 'friends'));
-		$widget = new FB_Widget();
-		add_action('wp_ajax_my_list_action', array(&$widget, 'show_widget'));
-		add_action('wp_ajax_nopriv_my_list_action', array(&$widget, 'show_widget'));
+		if (get_option('AFP_my_header')) {
+			$widget = new FB_Widget();
+			add_action('wp_ajax_my_list_action', array(&$widget, 'show_widget'));
+			add_action('wp_ajax_nopriv_my_list_action', array(&$widget, 'show_widget'));
+		}
 		
 		add_action('wp_head', array(&$this, 'header_meta'));
 		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
@@ -106,10 +108,15 @@ class FacebookAutomaticShare  {
 							),
 						));
 						echo '<li class="' . ($user['id'] == $facebook_user?'fb_me':'fb_user') . '" title="' . $user['name'] . ' ' . sprintf('ha visto %s artículo(s)', $friend->num) . '" >';
-							echo '<img src="' . $user['picture'] . '" />';
 							if ($user['id'] == $facebook_user) {
+								if (!get_option('AFP_my_header')) {
+									echo '</li>';
+									continue;
+								}
+								echo '<img src="' . $user['picture'] . '" />';
 								echo '<div class="fb_my_list hidden"></div>';
 							} else {
+								echo '<img src="' . $user['picture'] . '" />';
 								echo '<ul class="hidden fb_articles">';
 									echo '<li class="fb_title_articles">' . sprintf(__('Artículos leídos por %s', true), $user['name']) . '</li>';
 									$sql = "SELECT post_id FROM $table_name WHERE fb_id = $friend->fb_id";
@@ -158,6 +165,7 @@ class FacebookAutomaticShare  {
 					update_option('AFP_' . $key, $_POST[$key]);
 				}
 			}
+			update_option('AFP_my_header', $_POST['my_header']);
 			if (!empty($_FILES['logo']['size'])) {
 				$logo = wp_handle_upload($_FILES['logo']);
 				update_option('AFP_social', $logo['url']);
@@ -192,6 +200,11 @@ class FacebookAutomaticShare  {
 				    wp_nonce_field('upload_AFP_social');
 				    echo '
 				    <input type="hidden" name="action" value="wp_handle_upload" />
+				</div>
+				<div>
+					<label for="my_header">' . __('Mostrar en la cabecera el listado del usuario actual', true) . '</label>
+					<input type="hidden" name="my_header" value="0" />
+					<input type="checkbox" ' . (get_option('AFP_my_header')?'checked="checked"':'') . ' id="my_header" name="my_header" value="1" />
 				</div>';
 				echo '<p class="submit"><input type="submit" value="Guardar cambios" class="button-primary" id="submit" name="submit"></p>
 			</form>

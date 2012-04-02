@@ -70,6 +70,7 @@ class FB_Widget extends WP_Widget {
 			if (!empty($title)) {
 				echo '<div class="fb_widget_title">' . $before_title . $title . $after_title . '</div>';
 			}
+			echo '<div style="clear: both;"></div>';
 			echo '<ul class="fb_articles_list clearfix">';
 		}
 

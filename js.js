@@ -53,15 +53,17 @@ function fb_friends($) {
 }
 
 function fb_my_list($) {
-	var ajaxurl = config.ajaxurl;
-	$.post(ajaxurl, {action: 'my_list_action'}, function(response) {
-		$('.fb_my_list').html(response);
-		fb_switcher($);
-		fb_delete_post($);
-	});
-	$('.fb_me').hover(function() {
-		$('.fb_my_list').toggleClass('hidden');
-	});
+	if ($(".fb_my_list").size() > 0) {
+		var ajaxurl = config.ajaxurl;
+		$.post(ajaxurl, {action: 'my_list_action'}, function(response) {
+			$('.fb_my_list').html(response);
+			fb_switcher($);
+			fb_delete_post($);
+		});
+		$('.fb_me').hover(function() {
+			$('.fb_my_list').toggleClass('hidden');
+		});
+	}
 }
 
 function fb_delete_post($) {

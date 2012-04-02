@@ -156,6 +156,7 @@ ul.fb_articles_list li:hover span.fb_delete_article {
 	right: 0px;
 	width: 300px;
 	background: #FFF;
+	z-index: 999;
 }
 
 .fb_my_list ul {
