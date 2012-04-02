@@ -1,10 +1,10 @@
 jQuery(document).ready(function($) {
 
-	if ($("#lazy").size() > 0) {
+	if ($("#fb_lazy").size() > 0) {
 		//var ajaxurl = 'http://www.muysencillo.com/wp-admin/admin-ajax.php';
 		var ajaxurl = config.ajaxurl;
 		$.post(ajaxurl, {action: 'friends_action'}, function(response) {
-			$("#lazy").html(response);
+			$("#fb_lazy").html(response);
 			fb_friends($);
 		});
 	}
