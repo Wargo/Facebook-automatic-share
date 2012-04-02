@@ -205,6 +205,7 @@ class FacebookAutomaticShare  {
 					<label for="my_header">' . __('Mostrar en la cabecera el listado del usuario actual', true) . '</label>
 					<input type="hidden" name="my_header" value="0" />
 					<input type="checkbox" ' . (get_option('AFP_my_header')?'checked="checked"':'') . ' id="my_header" name="my_header" value="1" />
+					<br />' . __('Normalmente reemplaza el widget, tener ambos activos puede causar problemas', true) . '
 				</div>';
 				echo '<p class="submit"><input type="submit" value="Guardar cambios" class="button-primary" id="submit" name="submit"></p>
 			</form>
