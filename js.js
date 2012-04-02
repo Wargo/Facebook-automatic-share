@@ -1,31 +1,16 @@
 jQuery(document).ready(function($) {
 
 	if ($("#fb_lazy").size() > 0) {
-		//var ajaxurl = 'http://www.muysencillo.com/wp-admin/admin-ajax.php';
 		var ajaxurl = config.ajaxurl;
 		$.post(ajaxurl, {action: 'friends_action'}, function(response) {
 			$("#fb_lazy").html(response);
 			fb_friends($);
+			fb_my_list($);
 		});
 	}
 
-	$('.delete_article').click(function() {
-		if (confirm('¿Deseas elmiminar este artículo?')) {
-			$(this).parent('li').fadeOut('slow', function() {
-				$(this).remove();	
-			});
-			var url = 'https://graph.facebook.com/' + $(this).attr('var');
-
-			$.ajax({
-				type: 'post',
-				url: url,
-				data: {"method":"delete","access_token":$(this).attr('data')},
-				dataType: 'json' 
-			});
-		}
-	});
-
 	fb_switcher($);
+	fb_delete_post($);
 
 });
 
@@ -64,5 +49,35 @@ function fb_friends($) {
 		$('ul.fb_articles').addClass('hidden');
 		$(this).find('ul').attr('class', current_class);
 		$(this).find('ul').toggleClass('hidden');
+	});
+}
+
+function fb_my_list($) {
+	var ajaxurl = config.ajaxurl;
+	$.post(ajaxurl, {action: 'my_list_action'}, function(response) {
+		$('.fb_my_list').html(response);
+		fb_switcher($);
+		fb_delete_post($);
+	});
+	$('.fb_me').hover(function() {
+		$('.fb_my_list').toggleClass('hidden');
+	});
+}
+
+function fb_delete_post($) {
+	$('.fb_delete_article').click(function() {
+		if (confirm('¿Deseas elmiminar este artículo?')) {
+			$(this).parent('li').fadeOut('slow', function() {
+				$(this).remove();	
+			});
+			var url = 'https://graph.facebook.com/' + $(this).attr('var');
+
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: {"method":"delete","access_token":$(this).attr('data')},
+				dataType: 'json' 
+			});
+		}
 	});
 }

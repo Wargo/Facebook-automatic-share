@@ -1,8 +1,8 @@
 .left {
-	float: left;
+	float: left !important;
 }
 .right {
-	float: right;
+	float: right !important;
 }
 .hidden {
 	display: none;
@@ -32,14 +32,22 @@ ul.fb_articles_list li {
 	margin: 0 0 5px 0 !important;
 	padding: 0 !important;
 }
-ul.fb_articles_list li span.delete_article {
+
+.fb_widget_title {
+	line-height: 25px;
+	float: left;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+ul.fb_articles_list li span.fb_delete_article {
 	width: 16px;
 	height: 16px;
 	display: block;
 	cursor: pointer;
 	float: right;
 }
-ul.fb_articles_list li:hover span.delete_article {
+ul.fb_articles_list li:hover span.fb_delete_article {
 	background: url(/wp-content/plugins/facebook-automatic-share/images/delete.png);
 }
 
@@ -69,6 +77,7 @@ ul.fb_articles_list li:hover span.delete_article {
 
 #fb_lazy {
 	float: left;
+	width: 100%;
 }
 
 #fb_lazy span.title {
@@ -80,12 +89,11 @@ ul.fb_articles_list li:hover span.delete_article {
 .fb_friends {
 	padding: 5px;
 	margin: 0;
-	width: 102%;
 	position: relative;
 }
 
+.fb_friends li.fb_me,
 .fb_friends li.fb_user {
-	cursor: pointer;
 	list-style: none;
 	float: left;
 	display: inline;
@@ -93,6 +101,11 @@ ul.fb_articles_list li:hover span.delete_article {
 	margin: 3px;
 }
 
+.fb_friends li.fb_me {
+	float: right;
+}
+
+.fb_friends li.fb_me img,
 .fb_friends li.fb_user img {
 	border: solid 1px #CCC;
 	padding: 1px;
@@ -134,4 +147,24 @@ ul.fb_articles_list li:hover span.delete_article {
 
 .fb_social {
 	margin: -5px -7px -6px -24px;
+}
+
+.fb_my_list {
+	padding: 5px;
+	border: solid 1px #CCC;
+	position: absolute;
+	right: 0px;
+	width: 300px;
+	background: #FFF;
+}
+
+.fb_my_list ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.fb_my_list ul li {
+	margin: 5px;
+	line-height: 15px;
 }

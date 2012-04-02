@@ -31,53 +31,64 @@ class FB_Widget extends WP_Widget {
 	 * @param array $args     Widget arguments.
 	 * @param array $instance Saved values from database.
 	 */
-	public function widget( $args, $instance ) {
-		extract( $args );
-		$title = apply_filters( 'widget_title', $instance['title'] );
+	public function widget($args, $instance) {
+		extract($args);
+		$title = apply_filters('widget_title', $instance['title']);
 
 		if (is_user_logged_in() && is_single()) {
-			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
-			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
+			$this->show_widget($title, $before_widget, $after_widget, false);
+		}
+	}
 
-			@include_once(WP_CONTENT_DIR . '/WP-FB-AutoConnect-Premium.php');
+	function show_widget($title = null, $before_widget = null, $after_widget = null, $isAjax = true) {
+		if (empty($title)) {
+			$title = 'Mis artículos';
+		}
+		require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
+		require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
 
-			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/facebook-platform/php-sdk-3.1.1/facebook.php');
-			$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true ));
-			$facebook->getUser();
-			$get_posts = 'https://graph.facebook.com/me/' . $this->url . '?access_token=' . $facebook->getAccessToken();
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $get_posts);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		@include_once(WP_CONTENT_DIR . '/WP-FB-AutoConnect-Premium.php');
 
-			$response = curl_exec($ch);
-			$articles = json_decode($response, true);
-			
-			if (count($articles['data'])) {
-				echo $before_widget;
-				if (empty($_SESSION['fb_disable'])) {
-					echo '<a href="/wp-content/plugins/facebook-automatic-share/disable.php" class="fb_switcher fb_disable" title="' . __('Deshabilitar publicación automática en Facebook', true) . '"></a>';
-				} else {
-					echo '<a href="/wp-content/plugins/facebook-automatic-share/enable.php" class="fb_switcher fb_enable" title="' . __('Habilitar la publicación automática en Facebook', true) . '"></a>';
-				}
-				if ( ! empty( $title ) ) {
-					echo '<div class="left">' . $before_title . $title . $after_title . '</div>';
-				}
-				echo '<ul class="fb_articles_list clearfix">';
+		require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/facebook-platform/php-sdk-3.1.1/facebook.php');
+		$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true));
+		$facebook->getUser();
+		$get_posts = 'https://graph.facebook.com/me/' . $this->url . '?access_token=' . $facebook->getAccessToken();
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $get_posts);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+		$response = curl_exec($ch);
+		$articles = json_decode($response, true);
+
+		if (count($articles['data'])) {
+			echo $before_widget;
+			if (empty($_SESSION['fb_disable'])) {
+				echo '<a href="/wp-content/plugins/facebook-automatic-share/disable.php" class="fb_switcher fb_disable" title="' . __('Deshabilitar publicación automática en Facebook', true) . '"></a>';
+			} else {
+				echo '<a href="/wp-content/plugins/facebook-automatic-share/enable.php" class="fb_switcher fb_enable" title="' . __('Habilitar la publicación automática en Facebook', true) . '"></a>';
 			}
-			
-			foreach ($articles['data'] as $article) {
-				echo '<li>';
-					echo '<span title="Borrar artículo" class="delete_article" data="' . $facebook->getAccessToken() . '" var="' . $article['id'] . '"></span>';
-					echo '<a href="' . $article['data'][$this->object]['url'] . '">';
+			if (!empty($title)) {
+				echo '<div class="fb_widget_title">' . $before_title . $title . $after_title . '</div>';
+			}
+			echo '<ul class="fb_articles_list clearfix">';
+		}
+
+		foreach ($articles['data'] as $article) {
+			echo '<li>';
+				echo '<span title="Borrar artículo" class="fb_delete_article" data="' . $facebook->getAccessToken() . '" var="' . $article['id'] . '"></span>';
+				echo '<a href="' . $article['data'][$this->object]['url'] . '">';
 					echo $article['data'][$this->object]['title'];
-					echo '</a>';
-				echo '</li>';
-			}
+				echo '</a>';
+			echo '</li>';
+		}
 
-			if (count($articles)) {
-				echo '</ul>';
-				echo $after_widget;
-			}
+		if (count($articles)) {
+			echo '</ul>';
+			echo $after_widget;
+		}
+
+		if ($isAjax) {
+			die;
 		}
 	}
 

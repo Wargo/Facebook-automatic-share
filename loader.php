@@ -2,7 +2,7 @@
 /*
  Plugin Name: Automatic Facebook Posting
  Description: Postea a FB lo que vayas leyendo. Este plugin requiere el plugin wp-fb-autoconnect
- Version: 1.1
+ Version: 1.2
  Author: Guille & Arques
  Author URI: http://artvisual.net
  */
@@ -26,8 +26,6 @@ class FacebookAutomaticShare  {
 	var $url = ''; // 'news.reads', 'muysencillo:learn'
 	var $image = ''; // 'http://www.elmundoenrosa.com/wp-content/themes/cuidado_infantil/images/logoblog.png'
 
-	var $current_post_id = '';
-
 	var $fields = array(
 		'namespace' => 'Namespace',
 		'action' => 'Acción',
@@ -47,7 +45,6 @@ class FacebookAutomaticShare  {
 		//register_activation_hook(__FILE__, array(&$this, 'install'));
 
 		// Acciones 
-		add_action('the_content', array(&$this, 'global_post'));
 		add_action('wpfb_add_to_asyncinit', array(&$this, 'fb_autologin'));
 		add_action('the_content', array(&$this, 'fb_publish_stream'));
 		//add_action('the_post', array(&$this, 'friends'));
@@ -55,6 +52,9 @@ class FacebookAutomaticShare  {
 		// Cargar por Ajax
 		add_action('wp_ajax_friends_action', array(&$this, 'friends'));
 		add_action('wp_ajax_nopriv_friends_action', array(&$this, 'friends'));
+		$widget = new FB_Widget();
+		add_action('wp_ajax_my_list_action', array(&$widget, 'show_widget'));
+		add_action('wp_ajax_nopriv_my_list_action', array(&$widget, 'show_widget'));
 		
 		add_action('wp_head', array(&$this, 'header_meta'));
 		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
@@ -68,14 +68,6 @@ class FacebookAutomaticShare  {
 		add_action('admin_menu', array(&$this, 'menu')); // Añade al menú del administrador la función menu()
 
 		add_action('wp_print_styles', array(&$this, 'styles'));
-	}
-
-	function global_post($content) {
-		if (is_single()) {
-			global $post;
-			$this->current_post_id = $post->ID;
-		}
-		return $content;
 	}
 
 	function friends() {
@@ -94,7 +86,7 @@ class FacebookAutomaticShare  {
 			$facebook = new Facebook(array('appId' => get_option('jfb_app_id'), 'secret' => get_option('jfb_api_sec'), 'cookie' => true ));
 			$facebook_user = $facebook->getUser();
 			$friends = $facebook->api('/me/friends');
-			$aux = array();
+			$aux = array($facebook_user);
 			global $wpdb;
 			$table_name = $wpdb->prefix . $this->table_name;
 
@@ -113,31 +105,32 @@ class FacebookAutomaticShare  {
 								'picture',
 							),
 						));
-						echo '<li class="fb_user" title="' . $user['name'] . ' ' . sprintf('ha visto %s artículo(s)', $friend->num) . '">';
+						echo '<li class="' . ($user['id'] == $facebook_user?'fb_me':'fb_user') . '" title="' . $user['name'] . ' ' . sprintf('ha visto %s artículo(s)', $friend->num) . '" >';
 							echo '<img src="' . $user['picture'] . '" />';
-							echo '<ul class="hidden fb_articles">';
-								echo '<li class="fb_title_articles">' . sprintf(__('Artículos leídos por %s', true), $user['name']) . '</li>';
-								$sql = "SELECT post_id FROM $table_name WHERE fb_id = $friend->fb_id";
-								$articles = $wpdb->get_results($sql);
-								foreach ($articles as $article) {
-									$image = '';
-									$post_thumbnail_id = get_post_meta($article->post_id, '_thumbnail_id', true );
-
-									if ($post_thumbnail_id) {
-										$image = wp_get_attachment_image_src($post_thumbnail_id);
-										if ($image) {
-											$image = $image[0];
+							if ($user['id'] == $facebook_user) {
+								echo '<div class="fb_my_list hidden"></div>';
+							} else {
+								echo '<ul class="hidden fb_articles">';
+									echo '<li class="fb_title_articles">' . sprintf(__('Artículos leídos por %s', true), $user['name']) . '</li>';
+									$sql = "SELECT post_id FROM $table_name WHERE fb_id = $friend->fb_id";
+									$articles = $wpdb->get_results($sql);
+									foreach ($articles as $article) {
+										$image = '';
+										if ($post_thumbnail_id = get_post_meta($article->post_id, '_thumbnail_id', true)) {
+											if ($image = wp_get_attachment_image_src($post_thumbnail_id)) {
+												$image = $image[0];
+											}
 										}
+										if (empty($image)) {
+											$post = get_post($article->post_id);
+											$image = $this->catch_that_image($post->post_content);
+										}
+										echo '<li class="fb_post_image">';
+											echo '<a title="' . get_the_title($article->post_id) . '" href="' . get_permalink($article->post_id) . '"><img src="' . $image . '" alt="' . get_the_title($article->post_id) . '" /></a>';
+										echo '</li>';
 									}
-									if (empty($image)) {
-										$post = get_post($article->post_id);
-										$image = $this->catch_that_image($post->post_content);
-									}
-									echo '<li class="fb_post_image">';
-										echo '<a title="' . get_the_title($article->post_id) . '" href="' . get_permalink($article->post_id) . '"><img src="' . $image . '" alt="' . get_the_title($article->post_id) . '" /></a>';
-									echo '</li>';
-								}
-							echo '</ul>';
+								echo '</ul>';
+							}
 						echo '</li>';
 					}
 				echo '</ul>';
@@ -283,6 +276,7 @@ class FacebookAutomaticShare  {
 	 * @return unknown
 	 */
 	function fb_publish_stream($content) {
+		session_start();
 		if (is_user_logged_in() && is_single() && empty($_SESSION['fb_disable'])) {
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_opts.php');
