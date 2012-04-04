@@ -84,7 +84,6 @@ ul.fb_articles_list li:hover span.fb_delete_article {
 }
 
 #fb_lazy {
-	float: left;
 	width: 100%;
 }
 
