@@ -78,7 +78,7 @@ class FacebookAutomaticShare  {
 			echo '<ul class="fb_friends">';
 				if ($image = get_option('AFP_social')) {
 					//echo '<fb:login-button scope="email,publish_actions" v="2" size="small" onlogin="jfb_js_login_callback();"><img src="' . $image . '" class="fb_social" /></fb:login-button>';
-					echo '<fb:login-button size="xlarge" onlogin="Log.info(\'onlogin callback\')">Entra en Muysencillo Social</fb:login-button>';
+					echo '<fb:login-button size="xlarge" onlogin="jfb_js_login_callback();">Entra en Muysencillo Social</fb:login-button>';
 				}
 			echo '</ul>';
 		} else {
