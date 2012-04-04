@@ -238,7 +238,8 @@ class FacebookAutomaticShare  {
 			   fb_id bigint(30) NOT NULL,
 			   post_id bigint(20) NOT NULL,
 			   blog_id bigint(20) DEFAULT NULL,
-			   UNIQUE KEY id (id)
+			   PRIMARY KEY id (id),
+			   UNIQUE KEY id (fb_id, post_id)
 		   );";
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
