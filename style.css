@@ -61,15 +61,15 @@ ul.fb_articles_list li:hover span.fb_delete_article {
 	height: 16px;
 	margin: 5px;
 */
-	width: 101px;
-	height: 30px;
+	width: 60px;
+	height: 20px;
 }
 
 .fb_switcher.fb_enable {
 	/*
 	background: url(/wp-content/plugins/facebook-automatic-share/images/disabled.png) no-repeat;
 	*/
-	background: url(/wp-content/plugins/facebook-automatic-share/images/switcher.png) no-repeat 0 -45px;
+	background: url(/wp-content/plugins/facebook-automatic-share/images/switcher.png) no-repeat 0 -26px;
 }
 
 .fb_switcher.fb_disable {
@@ -80,7 +80,7 @@ ul.fb_articles_list li:hover span.fb_delete_article {
 }
 
 .fb_switcher.fb_loading {
-	background: url(/wp-content/plugins/facebook-automatic-share/images/ajax-loader.gif) no-repeat 41px 8px;
+	background: url(/wp-content/plugins/facebook-automatic-share/images/ajax-loader.gif) no-repeat 21px 0px;
 }
 
 #fb_lazy {
