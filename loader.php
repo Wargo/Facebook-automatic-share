@@ -74,12 +74,11 @@ class FacebookAutomaticShare  {
 
 	function friends() {
 		if (!is_user_logged_in()) {
-			echo '<span class="title">' . __('Descubre qué trucos les han gustado a tus amigos', true) . '</span>';
+			echo '<span class="title">' . __('Descubre qué artículos han leído tus amigos', true) . '</span>';
 			echo '<ul class="fb_friends">';
-				if ($image = get_option('AFP_social')) {
-					//echo '<fb:login-button scope="email,publish_actions" v="2" size="small" onlogin="jfb_js_login_callback();"><img src="' . $image . '" class="fb_social" /></fb:login-button>';
-					echo '<fb:login-button scope="email,publish_actions" size="xlarge" onlogin="jfb_js_login_callback();">Entra en Muysencillo Social</fb:login-button>';
-				}
+				echo '<fb:login-button scope="email,publish_actions" size="xlarge" onlogin="jfb_js_login_callback();">';
+				echo get_option('AFP_social');
+				echo '</fb:login-button>';
 			echo '</ul>';
 		} else {
 			require_once(WP_PLUGIN_DIR . '/wp-fb-autoconnect/__inc_wp.php');
@@ -167,10 +166,7 @@ class FacebookAutomaticShare  {
 				}
 			}
 			update_option('AFP_my_header', $_POST['my_header']);
-			if (!empty($_FILES['logo']['size'])) {
-				$logo = wp_handle_upload($_FILES['logo']);
-				update_option('AFP_social', $logo['url']);
-			}
+			update_option('AFP_social', $_POST['social']);
 		}
 
 		global $wpdb;
@@ -191,16 +187,12 @@ class FacebookAutomaticShare  {
 					<div>
 					';
 				}
+				$value = get_option('AFP_social');
 				echo '
 				<div>
-				    <label for="logo">' . __('Adjunta una imagen para el módulo de compartir', true) . '</label>
-				    <input type="file" name="logo" id="logo" />';
-				    if ($img = get_option('AFP_social')) {
-					echo '<br /><img src="' . $img . '" style="max-width: 200px;" />';
-				    }   
-				    wp_nonce_field('upload_AFP_social');
+				    <label for="social">' . __('Texto del botón de login', true) . '</label>
+				    <input type="text" name="social" id="social" value="' . $value . '" />';
 				    echo '
-				    <input type="hidden" name="action" value="wp_handle_upload" />
 				</div>
 				<div>
 					<label for="my_header">' . __('Mostrar en la cabecera el listado del usuario actual', true) . '</label>
