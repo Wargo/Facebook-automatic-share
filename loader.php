@@ -332,7 +332,7 @@ class FacebookAutomaticShare  {
 
 	function fb_autologin() {
 		global $post;
-		if (!is_user_logged_in() && (!empty($_REQUEST['fb_action_ids']))) {
+		if (!is_user_logged_in()) {// && (!empty($_REQUEST['fb_action_ids']))) {
 			// Revisar el like del plugin de FB
 			echo 'jfb_js_login_callback();';
 		} 
