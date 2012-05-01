@@ -74,7 +74,7 @@ class FacebookAutomaticShare  {
 
 	function friends() {
 		if (!is_user_logged_in()) {
-			echo '<span class="title">' . __('Descubre qué artículos han leído tus amigos', true) . '</span>';
+			echo '<span class="title">' . __('Descubre qué han leído tus amigos', true) . '</span>';
 			echo '<ul class="fb_friends">';
 				echo '<fb:login-button scope="email,publish_actions" size="xlarge" onlogin="jfb_js_login_callback();">';
 				echo get_option('AFP_social');
@@ -93,7 +93,8 @@ class FacebookAutomaticShare  {
 			$table_name = $wpdb->prefix . $this->table_name;
 
 			if (count($friends['data'])) {
-				echo '<span class="title">' . __('Descubre qué trucos les han gustado a tus amigos', true) . '</span>';
+				//echo '<span class="title">' . __('Descubre qué trucos les han gustado a tus amigos', true) . '</span>';
+				echo '<span class="title">' . __('Descubre qué han leído tus amigos', true) . '</span>';
 				echo '<ul class="fb_friends">';
 					foreach ($friends['data'] as $friend) {
 						$aux[] = $friend['id'];
