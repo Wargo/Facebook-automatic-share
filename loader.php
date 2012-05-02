@@ -77,7 +77,7 @@ class FacebookAutomaticShare  {
 			echo '<span class="title">' . __('Descubre qué han leído tus amigos', true) . '</span>';
 			echo '<ul class="fb_friends">';
 				echo '<fb:login-button scope="email,publish_actions" size="xlarge" onlogin="jfb_js_login_callback();">';
-				echo get_option('AFP_social');
+					echo get_option('AFP_social');
 				echo '</fb:login-button>';
 			echo '</ul>';
 		} else {
